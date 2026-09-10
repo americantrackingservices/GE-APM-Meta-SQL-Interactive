@@ -45,21 +45,6 @@
         }
     </style>
 </head>
-<!-- Chosen Palette: Slate & Warm Industrial Gold/Emerald Neutral -->
-<!-- Application Structure Plan:
-  1. Header & Navigation: High-level metrics summary bar with non-linear thematic navigation.
-  2. Section 1 - Architecture & Deployment: Interactive view of APM Connect topology, security roles matrix, UTC temporal rule, and Formatted vs Unformatted execution simulator.
-  3. Section 2 - Query Classifications & Relational Joins: Live Join Builder, Crosstab matrix matrix generator, and line-style mapping visualizer.
-  4. Section 3 - Interactive Meta SQL Function Library: Filterable/Searchable repository of aggregate, string, temporal, and proprietary functions with DBMS compatibility warnings and live syntax evaluator.
-  5. Section 4 - Performance Optimization Workbench: Comparative anti-pattern vs optimized query diagnostic tool, complete with live latency Chart.js visualizations.
-  6. Section 5 - Module Reference & Dynamic Meta SQL Generator: Interactive wizard allowing users to configure APM module queries (Asset Hierarchy, TM, IM, RBI) and output syntactically valid Meta SQL code.
-  Rationale: The structure prioritizes practical developer synthesis and fast lookup over static chapter reading, enabling technical users to test syntax, diagnose performance, and generate code directly. -->
-<!-- Visualization & Content Choices:
-  - Chart.js Radar & Bar Charts: Used for Performance Latency Benchmark comparisons and DBMS compatibility matrix (Canvas-based).
-  - HTML/CSS Dynamic Diagrams: Used for Relational Join line-style indicators and APM Connect Topology flow (NO SVG).
-  - Live Syntax Evaluators: Used for String, DatePart, and Crosstab bucket calculation demonstrations.
-  - Modal / Accordion Tables: Used for Security Roles, Functions, and Module schemas. -->
-<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
@@ -284,9 +269,9 @@
                             </p>
                             <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Meta SQL Syntax Example:</div>
                             <pre id="qdetail-code" class="code-block p-4 rounded text-xs leading-relaxed overflow-x-auto border border-slate-800">
-SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID", 
-       [MI_EQUIP000].[EQUIP_TECH_NBR_C] "Tech Number",
-       [MI_FNCLOC00].[FNC_LOC_C] "Functional Location"
+SELECT [MI_EQUIP000].[MI_EQUIP000_EQUIP_ID_C] "Equipment ID", 
+       [MI_EQUIP000].[MI_EQUIP000_EQUIP_TECH_NBR_C] "Tech Number",
+       [MI_FNCLOC00].[MI_FNCLOC00_FNC_LOC_C] "Functional Location"
 FROM [MI_EQUIP000] 
 JOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}</pre>
                         </div>
@@ -459,14 +444,28 @@ FROM [APM General Recommendation]</pre>
         <!-- TAB 5: MODULES & META SQL GENERATOR -->
         <section id="sec-modules" class="tab-content hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-xl font-bold text-slate-900 mb-2">Module Reference & Interactive Meta SQL Query Synthesizer</h2>
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xl font-bold text-slate-900">Module Reference & Unvalidated Meta SQL Query Synthesizer</h2>
+                    <span class="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Prototype Status</span>
+                </div>
+                
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-3 mb-4 rounded-r-lg text-xs text-amber-900 flex gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div>
+                        <strong class="block mb-1">Architectural Disclaimer: Unvalidated Draft Meta SQL</strong>
+                        This generation utility has been updated to structurally align with Westlake APM metadata definitions where available, and implements strict clause-order controls. However, it cannot dynamically connect to an APM compiler to verify relationships or grammar. Code generated here must be tested in an APM non-production environment prior to operational use.
+                    </div>
+                </div>
+                
                 <p class="text-slate-600 text-sm leading-relaxed mb-4">
                     Synthesize functional GE APM Meta SQL statements tailored to core modules: Asset Hierarchy, Thickness Monitoring (TM), Inspection Management (IM), and Risk Based Inspection (RBI).
                 </p>
 
                 <!-- Generator Wizard Interface -->
-                <div class="bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 my-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 my-6 space-y-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-widest shadow-md">Unvalidated Output</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                         <!-- Module Choice -->
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">1. Target APM Module</label>
@@ -500,7 +499,10 @@ FROM [APM General Recommendation]</pre>
                     <!-- Generated Meta SQL Code Output -->
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Synthesized GE APM Meta SQL Command:</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                Synthesized GE APM Meta SQL Command:
+                                <span id="status-badge" class="px-1.5 py-0.5 rounded text-[9px] bg-slate-700 text-slate-300">AWAITING COMPILATION</span>
+                            </span>
                             <button onclick="copyGeneratedSQL()" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-1 rounded transition">Copy Code</button>
                         </div>
                         <pre id="gen-output-code" class="code-block p-4 rounded-lg text-xs leading-relaxed overflow-x-auto border border-slate-700 min-h-[120px] text-sky-300">
@@ -573,7 +575,7 @@ FROM [APM General Recommendation]</pre>
             // Temporal
             { name: "DateAdd / MI_DateAdd", category: "TEMPORAL", syntax: "DateAdd('dd', 30, [Date_Field])", desc: "Shifts timestamps by specified interval.", quirk: "Oracle natively lacks month/year additions; Meta SQL substitutes 365.25d for years and 30d for months." },
             { name: "DatePart / MI_DatePart", category: "TEMPORAL", syntax: "DatePart('yyyy', [Date_Field])", desc: "Extracts numerical chronological components (yyyy, q, mm, ww, dd, hh, mi).", quirk: "Returns integer value." },
-            { name: "DateFormat", category: "TEMPORAL", syntax: "DateFormat([Date_Field], 'yyyy-mm-dd')", desc: "Casts temporal variables into structured strings.", quirk: "Oracle ignores fractional seconds; MS SQL Server rejects 'ddd' (day of year)." },
+            { name: "DateFormat", category: "TEMPORAL", syntax: "DateFormat(<date_format>, <expression>)\ne.g. DateFormat('yyyy-mm-dd', [Date_Field])", desc: "Casts temporal variables into structured strings. Format string must be first argument.", quirk: "Oracle ignores fractional seconds; MS SQL Server rejects 'ddd' (day of year)." },
             { name: "DateDiff", category: "TEMPORAL", syntax: "DateDiff('dd', [Start_Date], [End_Date])", desc: "Calculates difference between two timestamps (End minus Start).", quirk: "Returns integer count in specified interval." },
             { name: "Now() / SysDate()", category: "TEMPORAL", syntax: "<= (Now() + 30)", desc: "Retrieves current server timestamp in UTC.", quirk: "Supports inline temporal modifiers (e.g. + 30 days)." },
 
@@ -649,33 +651,33 @@ FROM [APM General Recommendation]</pre>
             if (type === 'select') {
                 title.innerText = "Select Queries Overview";
                 desc.innerText = "Select queries return structured 2D matrices. Field aliases are capped at 27 characters and auto-indexed if duplicate names occur.";
-                code.innerText = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID", 
-       [MI_EQUIP000].[EQUIP_TECH_NBR_C] "Tech Number",
-       [MI_FNCLOC00].[FNC_LOC_C] "Functional Location"
+                code.innerText = `SELECT [MI_EQUIP000].[MI_EQUIP000_EQUIP_ID_C] "Equipment ID", 
+       [MI_EQUIP000].[MI_EQUIP000_EQUIP_TECH_NBR_C] "Tech Number",
+       [MI_FNCLOC00].[MI_FNCLOC00_FNC_LOC_C] "Functional Location"
 FROM [MI_EQUIP000] 
 JOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}`;
                 footer.innerHTML = "<strong>Key Rule:</strong> Mathematical aggregations force unformatted execution behavior.";
             } else if (type === 'crosstab') {
                 title.innerText = "Crosstab Queries & Matrix Aggregation";
                 desc.innerText = "Pivots multidimensional data horizontally and vertically using DECODE and SIGN logic to aggregate metrics into matrix buckets.";
-                code.innerText = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Asset",
+                code.innerText = `SELECT [MI_EQUIP000].[MI_EQUIP000_EQUIP_ID_C] "Asset",
        SUM(DECODE(SIGN([DOWNTIME] - 7), -1, [DOWNTIME], 0, [DOWNTIME], 0)) "1 to 7 Days",
        SUM(DECODE(SIGN([DOWNTIME] - 7), 1, [DOWNTIME], 0)) "Over 7 Days"
 FROM [MI_EQUIP000]
 JOIN_SUCC [MI_EVENT] ON {Asset Has Event}
-GROUP BY [MI_EQUIP000].[EQUIP_ID_C]`;
+GROUP BY [MI_EQUIP000].[MI_EQUIP000_EQUIP_ID_C]`;
                 footer.innerHTML = "<strong>Key Rule:</strong> Combines SIGN remainder checking with DECODE for variable bucket routing.";
             } else if (type === 'action') {
                 title.innerText = "Action Queries (Update / Append / Delete)";
                 desc.innerText = "Action queries modify underlying database states. Append queries use 'Append To' field mapping; Delete permanently purges records.";
                 code.innerText = `-- UPDATE EXAMPLE
 UPDATE [MI_EQUIP000]
-SET [MANUFACTURER_C] = 'General Electric'
-WHERE [MANUFACTURER_C] = 'GE Industrial';
+SET [MI_EQUIP000_MFR_C] = 'General Electric'
+WHERE [MI_EQUIP000_MFR_C] = 'GE Industrial';
 
 -- DELETE EXAMPLE (Requires Super User)
 DELETE FROM [MI_EVNT000]
-WHERE [EVENT_DATE_D] < (Now() - 365);`;
+WHERE [MI_EVNT000_EVNT_STRT_D] < (Now() - 365);`;
                 footer.innerHTML = "<strong>Safety Guardrail:</strong> Always execute a SELECT query first to validate record targets before running UPDATE or DELETE.";
             }
         }
@@ -716,7 +718,7 @@ WHERE [EVENT_DATE_D] < (Now() - 365);`;
                             <span class="text-[10px] px-2 py-0.5 rounded font-semibold ${catBadge}">${f.category}</span>
                         </div>
                         <p class="text-xs text-slate-600 mb-3">${f.desc}</p>
-                        <pre class="bg-slate-900 text-sky-300 p-2 rounded text-[11px] font-mono overflow-x-auto mb-3">${f.syntax}</pre>
+                        <pre class="bg-slate-900 text-sky-300 p-2 rounded text-[11px] font-mono overflow-x-auto mb-3 whitespace-pre-wrap">${f.syntax}</pre>
                     </div>
                     <div class="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
                         <strong>DBMS Quirk:</strong> ${f.quirk}
@@ -748,8 +750,8 @@ WHERE [EVENT_DATE_D] < (Now() - 365);`;
                 badLatency: 450, goodLatency: 35
             },
             wildcard: {
-                bad: `SELECT [ASSET_ID_CHR] FROM [MI_EQUIP000]\nWHERE [ASSET_ID_CHR] LIKE '%PUMP'`,
-                good: `SELECT [ASSET_ID_CHR] FROM [MI_EQUIP000]\nWHERE [ASSET_ID_CHR] LIKE 'PUMP%'`,
+                bad: `SELECT [MI_EQUIP000_EQUIP_ID_C] FROM [MI_EQUIP000]\nWHERE [MI_EQUIP000_EQUIP_ID_C] LIKE '%PUMP'`,
+                good: `SELECT [MI_EQUIP000_EQUIP_ID_C] FROM [MI_EQUIP000]\nWHERE [MI_EQUIP000_EQUIP_ID_C] LIKE 'PUMP%'`,
                 eval: "Leading wildcards (%Value) force full table scans by bypassing B-Tree indices. Prefix wildcards (Value%) preserve index seek utilization.",
                 badLatency: 380, goodLatency: 22
             },
@@ -760,8 +762,8 @@ WHERE [EVENT_DATE_D] < (Now() - 365);`;
                 badLatency: 290, goodLatency: 40
             },
             or_union: {
-                bad: `SELECT [ASSET_ID] FROM [EQUIP]\nWHERE [TYPE] = 'PUMP' OR [LOCATION] = 'PLANT-1'`,
-                good: `SELECT [ASSET_ID] FROM [EQUIP] WHERE [TYPE] = 'PUMP'\nUNION\nSELECT [ASSET_ID] FROM [EQUIP] WHERE [LOCATION] = 'PLANT-1'`,
+                bad: `SELECT [MI_EQUIP000_EQUIP_ID_C] FROM [MI_EQUIP000]\nWHERE [MI_EQUIP000_EQUIP_TYP_C] = 'PUMP' OR [MI_EQUIP000_LOC_C] = 'PLANT-1'`,
+                good: `SELECT [MI_EQUIP000_EQUIP_ID_C] FROM [MI_EQUIP000] WHERE [MI_EQUIP000_EQUIP_TYP_C] = 'PUMP'\nUNION\nSELECT [MI_EQUIP000_EQUIP_ID_C] FROM [MI_EQUIP000] WHERE [MI_EQUIP000_LOC_C] = 'PLANT-1'`,
                 eval: "Relational engines often bypass indices on OR logic. Restructuring into UNION allows independent index seek executions.",
                 badLatency: 310, goodLatency: 55
             }
@@ -826,6 +828,62 @@ WHERE [EVENT_DATE_D] < (Now() - 365);`;
         }
 
         // --- TAB 5: MODULE META SQL GENERATOR ---
+        // Structured Clause Builder approach replacing simple string concatenation
+        
+        class QueryBuilder {
+            constructor() {
+                this.select = [];
+                this.from = "";
+                this.joins = [];
+                this.where = [];
+                this.groupBy = [];
+                this.orderBy = [];
+            }
+
+            setFrom(schema) {
+                this.from = schema;
+                return this;
+            }
+
+            addSelect(field, alias) {
+                this.select.push(`${field} "${alias}"`);
+                return this;
+            }
+
+            addJoin(joinString) {
+                this.joins.push(joinString);
+                return this;
+            }
+
+            addWhere(condition) {
+                this.where.push(condition);
+                return this;
+            }
+
+            addGroupBy(field) {
+                this.groupBy.push(field);
+                return this;
+            }
+
+            build() {
+                let query = `SELECT ${this.select.join(',\n       ')}\nFROM ${this.from}`;
+                
+                if (this.joins.length > 0) {
+                    query += `\n${this.joins.join('\n')}`;
+                }
+                
+                if (this.where.length > 0) {
+                    query += `\nWHERE ${this.where.join(' AND ')}`;
+                }
+                
+                if (this.groupBy.length > 0) {
+                    query += `\nGROUP BY ${this.groupBy.join(', ')}`;
+                }
+
+                return query;
+            }
+        }
+
         const moduleOptions = {
             ASSET: {
                 filters: [
@@ -839,21 +897,21 @@ WHERE [EVENT_DATE_D] < (Now() - 365);`;
                     { id: "TM_CORROSION", label: "TML Groups with High Corrosion Rates" },
                     { id: "TM_READINGS", label: "Recent Thickness Measurements" }
                 ],
-                info: "<strong>Target Schema:</strong> [MI_TMLGRP00] JOIN_SUCC [MI_TML00000] ON {TML Has TML Group}<br><strong>Security Group:</strong> TM Inspector / Data Clerk"
+                info: "<strong>Target Schema:</strong> [MI_EQUIP000] → {Has TML Group} → [MI_TMLGRP00] → {Has Datapoints} → [MI_THMSMTL] → {Has Corrosion Analyses} → [MI_CRRANLSS]<br><strong>Security Group:</strong> TM Inspector / Data Clerk"
             },
             IM: {
                 filters: [
                     { id: "IM_TASKS", label: "Pending Inspection Tasks" },
                     { id: "IM_RECS", label: "Open Inspection Recommendations" }
                 ],
-                info: "<strong>Target Schema:</strong> [MI_INSPTASK] JOIN_SUCC [MI_INSPRECS] ON {Task Has Recommendations}<br><strong>Security Group:</strong> Inspector / Inspection Supervisor"
+                info: "<strong>Target Schema:</strong> [MI_TASKINSP] JOIN_SUCC [MI_INSPRECS] ON {Task Has Recommendations}<br><strong>Security Group:</strong> Inspector / Inspection Supervisor"
             },
             RBI: {
                 filters: [
                     { id: "RBI_RISK", label: "High Probability of Failure Analyses" },
                     { id: "RBI_LOSS", label: "Production Loss Events Linked to Risk" }
                 ],
-                info: "<strong>Target Schema:</strong> [MI_CCRBICOM] JOIN [MI_MRBIANAL] ON {MIR_RBICRAN}<br><strong>Security Group:</strong> RBI Analyst"
+                info: "<strong>Target Schema:</strong> [MI_RBICOMPO] JOIN [MI_MRBIANAL] ON {MIR_RBICRAN}<br><strong>Security Group:</strong> RBI Analyst"
             }
         };
 
@@ -880,49 +938,84 @@ WHERE [EVENT_DATE_D] < (Now() - 365);`;
             const filter = document.getElementById('gen-filter').value;
             const time = document.getElementById('gen-time').value;
             const output = document.getElementById('gen-output-code');
+            const statusBadge = document.getElementById('status-badge');
 
-            let sql = "";
+            let builder = new QueryBuilder();
 
+            // 1. Configure Base Query structure based on selections
             if (mod === "ASSET") {
+                builder.setFrom("[MI_EQUIP000]");
                 if (filter === "EQ_FL") {
-                    sql = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID",\n       [MI_EQUIP000].[EQUIP_TECH_NBR_C] "Tech Number",\n       [MI_FNCLOC00].[FNC_LOC_C] "Functional Location"\nFROM [MI_EQUIP000]\nJOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}`;
+                    builder.addSelect("[MI_EQUIP000].[MI_EQUIP000_EQUIP_ID_C]", "Equipment ID")
+                           .addSelect("[MI_EQUIP000].[MI_EQUIP000_EQUIP_TECH_NBR_C]", "Tech Number")
+                           .addSelect("[MI_FNCLOC00].[MI_FNCLOC00_FNC_LOC_C]", "Functional Location")
+                           .addJoin("JOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}");
                 } else {
-                    sql = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID",\n       [MI_EQUIP000].[ASSET_CMMS_ID] "EAM CMMS Key"\nFROM [MI_EQUIP000]\nWHERE [MI_EQUIP000].[ASSET_CMMS_ID] IS NOT NULL`;
+                    builder.addSelect("[MI_EQUIP000].[MI_EQUIP000_EQUIP_ID_C]", "Equipment ID")
+                           .addSelect("[MI_EQUIP000].[ASSET_CMMS_ID]", "EAM CMMS Key")
+                           .addWhere("[MI_EQUIP000].[ASSET_CMMS_ID] IS NOT NULL");
                 }
             } else if (mod === "TM") {
                 if (filter === "TM_CORROSION") {
-                    sql = `SELECT [MI_TMLGRP00].[TML_GROUP_ID_C] "TML Group",\n       AVG([MI_TML00000].[CORROSION_RATE_N]) "Avg Corrosion Rate (IN/YR)"\nFROM [MI_TMLGRP00]\nJOIN_SUCC [MI_TML00000] ON {TML Has TML Group}\nGROUP BY [MI_TMLGRP00].[TML_GROUP_ID_C]`;
+                    builder.setFrom("[MI_TMLGRP00]")
+                           .addSelect("[MI_TMLGRP00].[TML_GROUP_ID_C]", "TML Group")
+                           .addSelect("AVG([MI_CRRANLSS].[CORROSION_RATE_N])", "Avg Corrosion Rate (IN/YR)")
+                           .addJoin("JOIN_SUCC [MI_THMSMTL] ON {Has Datapoints}")
+                           .addJoin("JOIN_SUCC [MI_CRRANLSS] ON {Has Corrosion Analyses}")
+                           .addGroupBy("[MI_TMLGRP00].[TML_GROUP_ID_C]");
                 } else {
-                    sql = `SELECT [MI_TML00000].[TML_ID_C] "TML ID",\n       [MI_TMREADING].[READING_VAL_N] "Thickness Reading"\nFROM [MI_TML00000]\nJOIN_SUCC [MI_TMREADING] ON {TML Has Readings}`;
+                    builder.setFrom("[MI_THMSMTL]")
+                           .addSelect("[MI_THMSMTL].[TML_ID_C]", "TML ID")
+                           .addSelect("[MI_TMREADING].[READING_VAL_N]", "Thickness Reading")
+                           .addJoin("JOIN_SUCC [MI_TMREADING] ON {Has Readings}");
                 }
             } else if (mod === "IM") {
                 if (filter === "IM_TASKS") {
-                    sql = `SELECT [MI_INSPTASK].[TASK_ID_C] "Task ID",\n       [MI_INSPTASK].[TASK_STATE_C] "State"\nFROM [MI_INSPTASK]\nWHERE [MI_INSPTASK].[TASK_STATE_C] = 'PENDING'`;
+                    builder.setFrom("[MI_TASKINSP]")
+                           .addSelect("[MI_TASKINSP].[TASK_ID_C]", "Task ID")
+                           .addSelect("[MI_TASKINSP].[TASK_STATE_C]", "State")
+                           .addWhere("[MI_TASKINSP].[TASK_STATE_C] = 'PENDING'");
                 } else {
-                    sql = `SELECT [MI_INSPRECS].[REC_ID_C] "Recommendation ID",\n       [MI_INSPRECS].[REC_STATUS_C] "Status"\nFROM [MI_INSPRECS]`;
+                    builder.setFrom("[MI_INSPRECS]")
+                           .addSelect("[MI_INSPRECS].[REC_ID_C]", "Recommendation ID")
+                           .addSelect("[MI_INSPRECS].[REC_STATUS_C]", "Status");
                 }
             } else if (mod === "RBI") {
                 if (filter === "RBI_RISK") {
-                    sql = `SELECT [MI_CCRBICOM].[COMPONENT_ID_C] "RBI Component",\n       MAX([MI_MRBIANAL].[MI_CRITANAL_PROB_OF_FAIL_UP_C]) "Max Failure Prob"\nFROM [MI_CCRBICOM]\nJOIN {MIR_RBICRAN} ON [MI_CCRBICOM].ENTY_KEY = {MIR_RBICRAN}.PRED_ENTY_KEY\nJOIN [MI_MRBIANAL] ON {MIR_RBICRAN}.SUCC_ENTY_KEY = [MI_MRBIANAL].ENTY_KEY\nGROUP BY [MI_CCRBICOM].[COMPONENT_ID_C]`;
+                    builder.setFrom("[MI_RBICOMPO]")
+                           .addSelect("[MI_RBICOMPO].[MI_RBICOMPO_COMPO_C]", "RBI Component")
+                           .addSelect("MAX([MI_MRBIANAL].[MI_CRITANAL_PROB_OF_FAIL_UP_C])", "Max Failure Prob")
+                           .addJoin("JOIN {MIR_RBICRAN} ON [MI_RBICOMPO].ENTY_KEY = {MIR_RBICRAN}.PRED_ENTY_KEY")
+                           .addJoin("JOIN [MI_MRBIANAL] ON {MIR_RBICRAN}.SUCC_ENTY_KEY = [MI_MRBIANAL].ENTY_KEY")
+                           .addGroupBy("[MI_RBICOMPO].[MI_RBICOMPO_COMPO_C]");
                 } else {
-                    sql = `SELECT [MI_PRDNEVNT].[EVENT_ID_C] "Event ID",\n       SUM([MI_PRDNLOSS].[LOSS_COST_N]) "Total Loss Cost"\nFROM [MI_PRDNEVNT]\nJOIN_SUCC [MI_PRDNLOSS] ON {MIR_CBPRDEVN}\nGROUP BY [MI_PRDNEVNT].[EVENT_ID_C]`;
+                    builder.setFrom("[MI_PRDNEVNT]")
+                           .addSelect("[MI_PRDNEVNT].[EVENT_ID_C]", "Event ID")
+                           .addSelect("SUM([MI_PRDNLOSS].[LOSS_COST_N])", "Total Loss Cost")
+                           .addJoin("JOIN_SUCC [MI_PRDNLOSS] ON {MIR_CBPRDEVN}")
+                           .addGroupBy("[MI_PRDNEVNT].[EVENT_ID_C]");
                 }
             }
 
-            // Apply Temporal Modifier
+            // 2. Apply Temporal Modifiers properly to the WHERE array BEFORE compilation
+            // Note: Date fields here are placeholders. True APM queries require specific family prefixes (e.g. [MI_TASKINSP].[MI_TASKINSP_DUE_DATE_D]).
             if (time === "DUE_30") {
-                sql += `\nWHERE [DUE_DATE_D] <= (Now() + 30)`;
+                builder.addWhere("[DUE_DATE_D] <= (Now() + 30)"); 
             } else if (time === "PAST_YEAR") {
-                sql += `\nWHERE [CREATE_DATE_D] >= (Now() - 365)`;
+                builder.addWhere("[CREATE_DATE_D] >= (Now() - 365)");
             }
 
-            output.innerText = sql;
+            // 3. Compile final SQL
+            output.innerText = builder.build();
+            
+            // Re-apply warning styling to emphasis unvalidated state
+            output.classList.add("border-amber-500");
         }
 
         function copyGeneratedSQL() {
             const code = document.getElementById('gen-output-code').innerText;
             navigator.clipboard.writeText(code);
-            alert("Meta SQL code copied to clipboard!");
+            alert("Draft Meta SQL code copied to clipboard! Remember to test and validate in APM before operational use.");
         }
 
         // --- INITIALIZATION ---
