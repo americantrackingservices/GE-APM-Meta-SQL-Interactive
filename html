@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GE Digital APM Meta SQL Architecture & Reference Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0f172a;
+            color: #38bdf8;
+        }
+        /* Custom scrollbar for function library & query builders */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<!-- Chosen Palette: Slate & Warm Industrial Gold/Emerald Neutral -->
+<!-- Application Structure Plan:
+  1. Header & Navigation: High-level metrics summary bar with non-linear thematic navigation.
+  2. Section 1 - Architecture & Deployment: Interactive view of APM Connect topology, security roles matrix, UTC temporal rule, and Formatted vs Unformatted execution simulator.
+  3. Section 2 - Query Classifications & Relational Joins: Live Join Builder, Crosstab matrix matrix generator, and line-style mapping visualizer.
+  4. Section 3 - Interactive Meta SQL Function Library: Filterable/Searchable repository of aggregate, string, temporal, and proprietary functions with DBMS compatibility warnings and live syntax evaluator.
+  5. Section 4 - Performance Optimization Workbench: Comparative anti-pattern vs optimized query diagnostic tool, complete with live latency Chart.js visualizations.
+  6. Section 5 - Module Reference & Dynamic Meta SQL Generator: Interactive wizard allowing users to configure APM module queries (Asset Hierarchy, TM, IM, RBI) and output syntactically valid Meta SQL code.
+  Rationale: The structure prioritizes practical developer synthesis and fast lookup over static chapter reading, enabling technical users to test syntax, diagnose performance, and generate code directly. -->
+<!-- Visualization & Content Choices:
+  - Chart.js Radar & Bar Charts: Used for Performance Latency Benchmark comparisons and DBMS compatibility matrix (Canvas-based).
+  - HTML/CSS Dynamic Diagrams: Used for Relational Join line-style indicators and APM Connect Topology flow (NO SVG).
+  - Live Syntax Evaluators: Used for String, DatePart, and Crosstab bucket calculation demonstrations.
+  - Modal / Accordion Tables: Used for Security Roles, Functions, and Module schemas. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-amber-500 text-slate-900 font-bold px-2.5 py-1 rounded text-sm tracking-wide">GE APM</span>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-100 hidden sm:block">Meta SQL Architectural Reference Platform</h1>
+                </div>
+                <nav class="flex space-x-1 overflow-x-auto py-2 text-xs md:text-sm font-medium">
+                    <button onclick="switchTab('architecture')" id="tab-btn-architecture" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Architecture & Roles</button>
+                    <button onclick="switchTab('queries')" id="tab-btn-queries" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Query Execution & Joins</button>
+                    <button onclick="switchTab('functions')" id="tab-btn-functions" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Function Library</button>
+                    <button onclick="switchTab('performance')" id="tab-btn-performance" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Performance Workbench</button>
+                    <button onclick="switchTab('modules')" id="tab-btn-modules" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition">Module SQL Generator</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Header Summary KPI Bar -->
+    <section class="bg-slate-800 border-b border-slate-700 text-slate-200 py-4 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700">
+                <span class="block text-xs uppercase tracking-wider text-slate-400">Supported DBMS</span>
+                <span class="text-lg font-bold text-amber-400">Oracle | SQL Server | Postgres</span>
+            </div>
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700">
+                <span class="block text-xs uppercase tracking-wider text-slate-400">Temporal Standard</span>
+                <span class="text-lg font-bold text-emerald-400">UTC Native Timestamp</span>
+            </div>
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700">
+                <span class="block text-xs uppercase tracking-wider text-slate-400">Query Classifications</span>
+                <span class="text-lg font-bold text-sky-400">5 Main Categories</span>
+            </div>
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700">
+                <span class="block text-xs uppercase tracking-wider text-slate-400">Alias Constraint</span>
+                <span class="text-lg font-bold text-indigo-400">27 Characters Max</span>
+            </div>
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 col-span-2 md:col-span-1">
+                <span class="block text-xs uppercase tracking-wider text-slate-400">Security Guardrail</span>
+                <span class="text-lg font-bold text-rose-400">MI Power / Super User</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: ARCHITECTURE & ROLES -->
+        <section id="sec-architecture" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">System Architecture & Operational Topology</h2>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    This section provides an architectural overview of GE Digital APM's Meta SQL abstraction layer. Meta SQL sits above native relational DBMS syntaxes (Oracle, Microsoft SQL Server, PostgreSQL), translating queries dynamically while enforcing platform-wide standards such as mandatory UTC temporal normalization and role-based security isolation.
+                </p>
+
+                <!-- Architecture Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+                    <!-- Topology Diagram Box -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-sky-100 text-sky-800">Deployment</span>
+                            <h3 class="font-bold text-slate-800 mt-2">APM Connect & EAM Adapters</h3>
+                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                Connects IIoT data streams and external Enterprise Asset Management (EAM) software to GE APM.
+                            </p>
+                            <ul class="text-xs text-slate-700 space-y-1.5 mt-3 list-disc pl-4">
+                                <li>Single Server Configuration recommended.</li>
+                                <li>Requires Java JDK 1.8 & APM Connect Container.</li>
+                                <li>PostgreSQL local instance or external DBMS cluster.</li>
+                                <li>MongoDB service required for System Monitoring.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-200 text-xs text-slate-500 font-mono">
+                            Web.config & AHM Integration Enabled
+                        </div>
+                    </div>
+
+                    <!-- UTC Standard Box -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Temporal Rule</span>
+                            <h3 class="font-bold text-slate-800 mt-2">UTC Date Standardization</h3>
+                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                All transactional dates and timestamps within GE Digital APM are stored strictly in Universal Coordinated Time (UTC).
+                            </p>
+                            <div class="mt-3 bg-emerald-50 p-3 rounded border border-emerald-200 text-xs text-emerald-900">
+                                <strong>Why it matters:</strong> Prevents synchronization errors across global IIoT sensors and regional EAM systems during time-series aggregation.
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-200 text-xs text-slate-500 font-mono">
+                            Now() & SysDate() calculate in UTC
+                        </div>
+                    </div>
+
+                    <!-- Execution Modes Simulator -->
+                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800">Execution Mode</span>
+                            <h3 class="font-bold text-slate-800 mt-2">Formatted vs Unformatted</h3>
+                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                Select queries operate in two modes. Unformatted is default for maximum performance; Formatted maps system keys to localized captions.
+                            </p>
+                            <div class="mt-3 space-y-2">
+                                <label class="text-xs font-medium text-slate-700 flex items-center justify-between">
+                                    <span>Interactive Preview Mode:</span>
+                                    <button onclick="toggleFormattedMode()" id="mode-toggle-btn" class="text-xs bg-slate-900 text-amber-400 px-2 py-1 rounded font-mono">Switch to Formatted</button>
+                                </label>
+                                <div id="mode-demo-output" class="p-2.5 rounded bg-slate-900 text-xs font-mono text-slate-200 border border-slate-700">
+                                    <span class="text-slate-400">// Unformatted Output (Raw DBMS System Code Key)</span><br>
+                                    ASSET_STATUS: <span class="text-amber-400">100492</span><br>
+                                    FAILURE_TYP: <span class="text-amber-400">SYS_CODE_MECH_01</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-[11px] text-slate-500 italic">
+                            * Note: Aggregations or "Show Totals" automatically force unformatted execution.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Matrix Table -->
+                <div class="mt-8">
+                    <h3 class="text-md font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <span>Security & Access Control Matrix</span>
+                    </h3>
+                    <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                        <table class="min-w-full divide-y divide-slate-200 text-xs text-left">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Operation / Query Type</th>
+                                    <th class="py-3 px-4">Required Security Role</th>
+                                    <th class="py-3 px-4">Catalog Folder Rights</th>
+                                    <th class="py-3 px-4">Operational Risk Guardrail</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">Select Query (Read)</td>
+                                    <td class="py-2.5 px-4">General Viewer / Module User</td>
+                                    <td class="py-2.5 px-4">View Permissions</td>
+                                    <td class="py-2.5 px-4 text-emerald-600">Low - Safe for dynamic analysis.</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">Update Query (Action)</td>
+                                    <td class="py-2.5 px-4">MI Power User / Super User</td>
+                                    <td class="py-2.5 px-4">View + Family Operational Rights</td>
+                                    <td class="py-2.5 px-4 text-amber-600">High - Irreversible; test Select query first.</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">Append Query (Action)</td>
+                                    <td class="py-2.5 px-4">MI Power User / Super User</td>
+                                    <td class="py-2.5 px-4">View + Family Operational Rights</td>
+                                    <td class="py-2.5 px-4 text-amber-600">Medium - Requires explicit field mapping configuration.</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">Delete Query (Action)</td>
+                                    <td class="py-2.5 px-4">Super User Exclusive</td>
+                                    <td class="py-2.5 px-4">Full Admin / Catalog Rights</td>
+                                    <td class="py-2.5 px-4 text-rose-600 font-bold">Critical - Purges records permanently from database.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: QUERY EXECUTION & JOINS -->
+        <section id="sec-queries" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Query Execution Paradigms & Relational Joins</h2>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    Explore Meta SQL's five primary query types and relational join mechanics. Meta SQL abstracts foreign key logic using explicit predecessor/successor relationships (`JOIN_SUCC`, `JOIN_PRED`, `{Relationship_Family}`).
+                </p>
+
+                <!-- Query Type Tabs & Interactive Workbench -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-6">
+                    <!-- Left Column: Query Selector -->
+                    <div class="lg:col-span-5 space-y-3">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Select Query Classification</label>
+                        <div class="space-y-2">
+                            <button onclick="showQueryDetails('select')" id="qtype-select" class="qtype-btn w-full text-left p-3 rounded-lg border border-amber-500 bg-amber-50/50 hover:bg-amber-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">1. Select Queries</div>
+                                <div class="text-xs text-slate-600 mt-1">2D matrix output, Formatted/Unformatted modes, 27-char alias indexing.</div>
+                            </button>
+                            <button onclick="showQueryDetails('crosstab')" id="qtype-crosstab" class="qtype-btn w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">2. Crosstab Queries</div>
+                                <div class="text-xs text-slate-600 mt-1">Pivots multidimensional data into aggregated matrices using DECODE & SIGN.</div>
+                            </button>
+                            <button onclick="showQueryDetails('action')" id="qtype-action" class="qtype-btn w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">3. Action Queries (Update / Append / Delete)</div>
+                                <div class="text-xs text-slate-600 mt-1">State-modifying operations requiring elevated security & safety checks.</div>
+                            </button>
+                        </div>
+
+                        <!-- Crosstab Interactive Threshold Calculator -->
+                        <div id="crosstab-calc-box" class="hidden bg-slate-900 text-slate-200 p-4 rounded-lg border border-slate-800 text-xs space-y-3">
+                            <div class="font-bold text-amber-400">Crosstab Downtime Bucket Logic Evaluator</div>
+                            <p class="text-slate-400 text-[11px]">Formula: DECODE(SIGN(Downtime - 7), -1, '1 to 7 Days', 0, '1 to 7 Days', 'Over 7 Days')</p>
+                            <div class="flex items-center gap-3">
+                                <label class="text-slate-300">Enter Downtime Days:</label>
+                                <input type="number" id="crosstab-days-input" value="10" oninput="evalCrosstabSign()" class="w-20 bg-slate-800 border border-slate-700 text-white rounded px-2 py-1 text-xs">
+                            </div>
+                            <div class="p-2.5 bg-slate-800 rounded border border-slate-700 font-mono">
+                                Computed Bucket: <span id="crosstab-result-bucket" class="text-emerald-400 font-bold">Over 7 Days</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Query Detail & Syntax Display -->
+                    <div class="lg:col-span-7 bg-slate-900 text-slate-200 p-5 rounded-lg border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 id="qdetail-title" class="text-md font-bold text-amber-400">Select Queries Overview</h3>
+                                <span id="qdetail-badge" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">READ-ONLY</span>
+                            </div>
+                            <p id="qdetail-desc" class="text-xs text-slate-300 leading-relaxed mb-4">
+                                Select queries extract structured data from entity families. If duplicate field aliases occur, the Meta SQL engine appends sequential integers (e.g. Asset0, Asset1) to preserve 27-character namespace rules.
+                            </p>
+                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Meta SQL Syntax Example:</div>
+                            <pre id="qdetail-code" class="code-block p-4 rounded text-xs leading-relaxed overflow-x-auto border border-slate-800">
+SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID", 
+       [MI_EQUIP000].[EQUIP_TECH_NBR_C] "Tech Number",
+       [MI_FNCLOC00].[FNC_LOC_C] "Functional Location"
+FROM [MI_EQUIP000] 
+JOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}</pre>
+                        </div>
+                        <div id="qdetail-footer" class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400">
+                            <strong>Key Rule:</strong> Mathematical aggregations automatically force execution into unformatted mode.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relational Join Visualizer & Matrix -->
+                <div class="mt-8">
+                    <h3 class="text-md font-bold text-slate-900 mb-3">Relational Join Mapping & Line Style Reference</h3>
+                    <p class="text-xs text-slate-600 mb-4">
+                        In the GE APM graphical query designer, join types are visually denoted by line styles and arrows. In code, they map to explicit `JOIN_SUCC` or `JOIN_PRED` clauses over APM relationship families or manual equal joins.
+                    </p>
+
+                    <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                        <table class="min-w-full divide-y divide-slate-200 text-xs text-left">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase">
+                                <tr>
+                                    <th class="py-3 px-4">Join Classification</th>
+                                    <th class="py-3 px-4">Database Execution Behavior</th>
+                                    <th class="py-3 px-4">UI Visual Indicator</th>
+                                    <th class="py-3 px-4">Meta SQL Clause Structure</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">APM Inner Join</td>
+                                    <td class="py-2.5 px-4">Only returns records actively linked via APM Relationship Family.</td>
+                                    <td class="py-2.5 px-4 font-mono text-slate-800">─────── (Solid Line)</td>
+                                    <td class="py-2.5 px-4 font-mono text-sky-700">FROM [T1] JOIN_SUCC [T2] ON {Rel_Fam}</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">Manual Inner Join</td>
+                                    <td class="py-2.5 px-4">Matches records based on dynamic field equality across unrelated families.</td>
+                                    <td class="py-2.5 px-4 font-mono text-slate-800">─────── (Solid Line)</td>
+                                    <td class="py-2.5 px-4 font-mono text-sky-700">FROM [T1] JOIN [T2] ON [T1].[F1] = [T2].[F2]</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">APM Outer Left Join</td>
+                                    <td class="py-2.5 px-4">Returns all predecessor records and matched successor records.</td>
+                                    <td class="py-2.5 px-4 font-mono text-slate-800">◄────── (Solid + Left Arrow)</td>
+                                    <td class="py-2.5 px-4 font-mono text-sky-700">FROM [T1] LEFT JOIN SUCC [T2] ON {Rel_Fam}</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">Manual Outer Left Join</td>
+                                    <td class="py-2.5 px-4">Returns all Table #1 records and matching Table #2 records.</td>
+                                    <td class="py-2.5 px-4 font-mono text-slate-800">- - - - - (Dashed Line)</td>
+                                    <td class="py-2.5 px-4 font-mono text-sky-700">FROM [T1] LEFT JOIN [T2] ON [T1].[F1] = [T2].[F2]</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2.5 px-4 font-semibold text-slate-900">APM Outer Right Join</td>
+                                    <td class="py-2.5 px-4">Returns all successor records regardless of predecessor linkage.</td>
+                                    <td class="py-2.5 px-4 font-mono text-slate-800">──────► (Solid + Right Arrow)</td>
+                                    <td class="py-2.5 px-4 font-mono text-sky-700">FROM [T1] RIGHT JOIN SUCC [T2] ON {Rel_Fam}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: FUNCTION LIBRARY -->
+        <section id="sec-functions" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Exhaustive Meta SQL Function Library</h2>
+                        <p class="text-slate-600 text-sm mt-1">Search and filter built-in functions for Aggregate, String, Temporal, and Proprietary Meridium abstractions.</p>
+                    </div>
+                    <!-- Controls -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input type="text" id="func-search-input" onkeyup="filterFunctions()" placeholder="Search function name..." class="bg-slate-100 border border-slate-300 text-xs rounded-lg px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <select id="func-cat-filter" onchange="filterFunctions()" class="bg-slate-100 border border-slate-300 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="ALL">All Categories</option>
+                            <option value="ANALYTIC">Analytic & Aggregate</option>
+                            <option value="STRING">Character & String</option>
+                            <option value="TEMPORAL">Temporal & Date</option>
+                            <option value="PROPRIETARY">Meridium Proprietary</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Function List Grid -->
+                <div id="func-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto p-1">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: PERFORMANCE WORKBENCH -->
+        <section id="sec-performance" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Performance Optimization Workbench & Anti-Pattern Diagnostic</h2>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    Evaluating Meta SQL query design against industrial database execution constraints. Inefficient joins, leading wildcards, or improper clause positioning introduce server-wide latency.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-6">
+                    <!-- Interactive Diagnostic Selector -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Select Optimization Scenario</label>
+                        <div class="space-y-2">
+                            <button onclick="selectPerfScenario('family_scope')" id="perf-btn-family_scope" class="perf-scenario-btn w-full text-left p-3 rounded-lg border border-amber-500 bg-amber-50/50 hover:bg-amber-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">1. Query Scope & Polymorphic Families</div>
+                                <div class="text-xs text-slate-600 mt-1">Root family scans vs specific sub-family targeting.</div>
+                            </button>
+                            <button onclick="selectPerfScenario('wildcard')" id="perf-btn-wildcard" class="perf-scenario-btn w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">2. Wildcard Search Index Bypassing</div>
+                                <div class="text-xs text-slate-600 mt-1">Leading `%Value` (Full Scan) vs Prefix `Value%` (Index Match).</div>
+                            </button>
+                            <button onclick="selectPerfScenario('where_having')" id="perf-btn-where_having" class="perf-scenario-btn w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">3. Pre vs Post Filter (WHERE vs HAVING)</div>
+                                <div class="text-xs text-slate-600 mt-1">Filtering records prior to aggregation vs memory aggregation first.</div>
+                            </button>
+                            <button onclick="selectPerfScenario('or_union')" id="perf-btn-or_union" class="perf-scenario-btn w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                                <div class="font-bold text-slate-900 text-sm">4. OR Logic vs UNION Restructuring</div>
+                                <div class="text-xs text-slate-600 mt-1">B-Tree index bypassing across OR conditions.</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Code Display -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Anti Pattern Box -->
+                            <div class="bg-rose-50 border border-rose-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold text-rose-800 uppercase tracking-wide">Sub-Optimal (Anti-Pattern)</span>
+                                    <span class="text-[10px] bg-rose-200 text-rose-900 font-bold px-2 py-0.5 rounded">High Latency</span>
+                                </div>
+                                <pre id="perf-code-bad" class="bg-slate-900 text-rose-300 p-3 rounded text-[11px] font-mono leading-relaxed overflow-x-auto h-32 border border-rose-300">
+SELECT * FROM [Recommendation]</pre>
+                            </div>
+
+                            <!-- Optimized Box -->
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide">Optimized Architecture</span>
+                                    <span class="text-[10px] bg-emerald-200 text-emerald-900 font-bold px-2 py-0.5 rounded">Fast Execution</span>
+                                </div>
+                                <pre id="perf-code-good" class="bg-slate-900 text-emerald-300 p-3 rounded text-[11px] font-mono leading-relaxed overflow-x-auto h-32 border border-emerald-300">
+SELECT [REC_ID_C], [REC_DESC_TE] 
+FROM [APM General Recommendation]</pre>
+                            </div>
+                        </div>
+
+                        <!-- Technical Rationale Output -->
+                        <div class="bg-slate-800 text-slate-200 p-4 rounded-lg border border-slate-700 text-xs">
+                            <span class="text-amber-400 font-bold">Architectural Evaluation:</span>
+                            <p id="perf-eval-text" class="mt-1 text-slate-300 leading-relaxed">
+                                Querying the root Recommendation family forces the DBMS to evaluate all polymorphic sub-families. Directing queries to explicit leaf families avoids unnecessary schema traversals.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latency Comparison Chart -->
+                <div class="mt-8 border-t border-slate-200 pt-6">
+                    <h3 class="text-md font-bold text-slate-900 mb-2">Simulated Query Execution Overhead (Milliseconds)</h3>
+                    <div class="chart-container">
+                        <canvas id="perfChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: MODULES & META SQL GENERATOR -->
+        <section id="sec-modules" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Module Reference & Interactive Meta SQL Query Synthesizer</h2>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    Synthesize functional GE APM Meta SQL statements tailored to core modules: Asset Hierarchy, Thickness Monitoring (TM), Inspection Management (IM), and Risk Based Inspection (RBI).
+                </p>
+
+                <!-- Generator Wizard Interface -->
+                <div class="bg-slate-900 text-slate-100 p-6 rounded-xl border border-slate-800 my-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Module Choice -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">1. Target APM Module</label>
+                            <select id="gen-module" onchange="updateGeneratorOptions()" class="w-full bg-slate-800 border border-slate-700 text-xs rounded-lg p-2.5 text-white focus:ring-2 focus:ring-amber-500">
+                                <option value="ASSET">Asset Hierarchy & Core</option>
+                                <option value="TM">Thickness Monitoring (TM)</option>
+                                <option value="IM">Inspection Management (IM)</option>
+                                <option value="RBI">Risk Based Inspection (RBI)</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter Criteria -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">2. Operational Filter / Target</label>
+                            <select id="gen-filter" onchange="generateMetaSQL()" class="w-full bg-slate-800 border border-slate-700 text-xs rounded-lg p-2.5 text-white focus:ring-2 focus:ring-amber-500">
+                                <!-- Dynamic options -->
+                            </select>
+                        </div>
+
+                        <!-- Date Window / Modifier -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">3. Temporal Scope</label>
+                            <select id="gen-time" onchange="generateMetaSQL()" class="w-full bg-slate-800 border border-slate-700 text-xs rounded-lg p-2.5 text-white focus:ring-2 focus:ring-amber-500">
+                                <option value="ALL">All Records (No Time Filter)</option>
+                                <option value="DUE_30">Due Within Next 30 Days <= (Now() + 30)</option>
+                                <option value="PAST_YEAR">Created Within Past Year</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Generated Meta SQL Code Output -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Synthesized GE APM Meta SQL Command:</span>
+                            <button onclick="copyGeneratedSQL()" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-3 py-1 rounded transition">Copy Code</button>
+                        </div>
+                        <pre id="gen-output-code" class="code-block p-4 rounded-lg text-xs leading-relaxed overflow-x-auto border border-slate-700 min-h-[120px] text-sky-300">
+// Select parameters above to compile Meta SQL...</pre>
+                    </div>
+
+                    <!-- Module Details Box -->
+                    <div id="gen-module-info" class="p-4 bg-slate-800 rounded-lg border border-slate-700 text-xs space-y-2">
+                        <!-- Dynamic Info -->
+                    </div>
+                </div>
+
+                <!-- Module Security Roles Reference Grid -->
+                <div class="mt-8">
+                    <h3 class="text-md font-bold text-slate-900 mb-3">Module Security Group Alignment</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="font-bold text-slate-900 block mb-1">Asset Hierarchy</span>
+                            <span class="text-slate-600 block mb-2">General Viewer</span>
+                            <p class="text-[11px] text-slate-500">Universal access to browse functional locations and equipment hierarchies.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="font-bold text-slate-900 block mb-1">Thickness Monitoring</span>
+                            <span class="text-slate-600 block mb-2">TM Inspector / Data Clerk</span>
+                            <p class="text-[11px] text-slate-500">Permits TML creation, corrosion rate calculations, and bulk thickness entry.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="font-bold text-slate-900 block mb-1">Inspection Management</span>
+                            <span class="text-slate-600 block mb-2">Inspector / Supervisor</span>
+                            <p class="text-[11px] text-slate-500">Supervisor role required to approve reports and close recommendation items.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="font-bold text-slate-900 block mb-1">Risk Based Inspection</span>
+                            <span class="text-slate-600 block mb-2">RBI Analyst</span>
+                            <p class="text-[11px] text-slate-500">Full operational access to update inspection plans and calculate failure probabilities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>GE Digital APM Meta SQL Architectural Abstraction & Reference Platform</p>
+            <p class="text-slate-500">Strictly adheres to GE APM UTC Temporal Standards & Schema Isolation Frameworks.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- GLOBAL DATA & FUNCTIONS DATABASE ---
+        const functionLibrary = [
+            // Analytic
+            { name: "ROW_NUMBER", category: "ANALYTIC", syntax: "ROW_NUMBER() OVER(PARTITION BY [FIELD] ORDER BY [FIELD] DESC)", desc: "Generates deterministic sequential integer identifiers for grouped datasets.", quirk: "Requires explicit ORDER BY to ensure deterministic results across SQL Server." },
+            { name: "CUME_DIST", category: "ANALYTIC", syntax: "CUME_DIST() OVER ([PARTITION BY [FIELD]] ORDER BY [FIELD] ASC)", desc: "Returns cumulative statistical distribution of a value relative to group.", quirk: "Supported uniformly across Oracle, SQL Server, and Postgres." },
+            { name: "PERCENT_RANK", category: "ANALYTIC", syntax: "PERCENT_RANK([FIELD]) OVER (PARTITION BY [FIELD] ORDER BY [FIELD] ASC)", desc: "Calculates relative fractional rank within partition.", quirk: "Returns value between 0 and 1." },
+            { name: "NTILE", category: "ANALYTIC", syntax: "NTILE(num_const) OVER (PARTITION BY [FIELD] ORDER BY [FIELD] DESC)", desc: "Distributes partitioned data into a specified positive integer number of buckets.", quirk: "Constant integer required as argument." },
+
+            // String
+            { name: "CONCAT / &", category: "STRING", syntax: "[Asset ID] & ':' & [Asset Type]", desc: "Merges multiple strings together.", quirk: "Ampersand (&) is standard Meta SQL operator." },
+            { name: "SUBSTR", category: "STRING", syntax: "SUBSTR([FIELD], start_index, count)", desc: "Extracts localized substring.", quirk: "1-based starting index." },
+            { name: "LTRIM / RTRIM", category: "STRING", syntax: "LTRIM([PhoneNumber], '(540)-')", desc: "Strips specified leading or trailing character sequences.", quirk: "Cleans dirty user input." },
+            { name: "INDEXOF", category: "STRING", syntax: "INDEXOF([FIELD], 'search_str')", desc: "Returns 1-based index integer of searched substring.", quirk: "CRITICAL: Case-sensitive on Oracle & Postgres, case-insensitive on MS SQL Server!" },
+            { name: "STRING_AGG", category: "STRING", syntax: "STRING_AGG([FIELD], ', ')", desc: "Concatenates values across grouped rows with defined delimiter.", quirk: "SQL Server caps at 8,000 chars; Oracle/Postgres return CLOB/TEXT." },
+            { name: "JSON_VALUE", category: "STRING", syntax: "JSON_VALUE([FAMILY].[JSON_FIELD], '$.property')", desc: "Extracts scalar values from JSON string attributes.", quirk: "Enforces strict scalar return typing." },
+
+            // Temporal
+            { name: "DateAdd / MI_DateAdd", category: "TEMPORAL", syntax: "DateAdd('dd', 30, [Date_Field])", desc: "Shifts timestamps by specified interval.", quirk: "Oracle natively lacks month/year additions; Meta SQL substitutes 365.25d for years and 30d for months." },
+            { name: "DatePart / MI_DatePart", category: "TEMPORAL", syntax: "DatePart('yyyy', [Date_Field])", desc: "Extracts numerical chronological components (yyyy, q, mm, ww, dd, hh, mi).", quirk: "Returns integer value." },
+            { name: "DateFormat", category: "TEMPORAL", syntax: "DateFormat([Date_Field], 'yyyy-mm-dd')", desc: "Casts temporal variables into structured strings.", quirk: "Oracle ignores fractional seconds; MS SQL Server rejects 'ddd' (day of year)." },
+            { name: "DateDiff", category: "TEMPORAL", syntax: "DateDiff('dd', [Start_Date], [End_Date])", desc: "Calculates difference between two timestamps (End minus Start).", quirk: "Returns integer count in specified interval." },
+            { name: "Now() / SysDate()", category: "TEMPORAL", syntax: "<= (Now() + 30)", desc: "Retrieves current server timestamp in UTC.", quirk: "Supports inline temporal modifiers (e.g. + 30 days)." },
+
+            // Proprietary
+            { name: "UserKey()", category: "PROPRIETARY", syntax: "UserKey()", desc: "Extracts primary key of currently authenticated session user.", quirk: "Essential for personal dashboard filters." },
+            { name: "LocalizedCaption()", category: "PROPRIETARY", syntax: "LocalizedCaption(<family_key>, <user_key>)", desc: "Translates family key into localized string caption for active language.", quirk: "Interfaces directly with APM translation engine." },
+            { name: "IsNull()", category: "PROPRIETARY", syntax: "IsNull([Cost_Field], 0)", desc: "Coalescing agent substituting secondary expression if primary is null.", quirk: "Arguments must match data types! Cast numbers using CastChar() first." },
+            { name: "Decode()", category: "PROPRIETARY", syntax: "Decode([Status], 'OPEN', 'Active', 'Closed')", desc: "Compares target field against input-output pairs.", quirk: "Standardizes raw system codes into human descriptions." }
+        ];
+
+        // --- TAB SWITCHING LOGIC ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-amber-500', 'text-slate-900', 'font-bold');
+                el.classList.add('text-slate-300');
+            });
+
+            document.getElementById('sec-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+            activeBtn.classList.add('bg-amber-500', 'text-slate-900', 'font-bold');
+            activeBtn.classList.remove('text-slate-300');
+
+            if (tabId === 'performance' && !window.chartInitialized) {
+                initPerfChart();
+            }
+        }
+
+        // --- TAB 1: FORMATTED MODE TOGGLE DEMO ---
+        let isFormatted = false;
+        function toggleFormattedMode() {
+            isFormatted = !isFormatted;
+            const btn = document.getElementById('mode-toggle-btn');
+            const output = document.getElementById('mode-demo-output');
+
+            if (isFormatted) {
+                btn.innerText = "Switch to Unformatted";
+                output.innerHTML = `
+                    <span class="text-emerald-400">// Formatted Mode Output (Localized Descriptions Mapped)</span><br>
+                    ASSET_STATUS: <span class="text-emerald-300">"In Service - Active"</span><br>
+                    FAILURE_TYP: <span class="text-emerald-300">"Mechanical Impeller Failure"</span>
+                `;
+            } else {
+                btn.innerText = "Switch to Formatted";
+                output.innerHTML = `
+                    <span class="text-slate-400">// Unformatted Mode Output (Raw DBMS Keys - High Speed)</span><br>
+                    ASSET_STATUS: <span class="text-amber-400">100492</span><br>
+                    FAILURE_TYP: <span class="text-amber-400">SYS_CODE_MECH_01</span>
+                `;
+            }
+        }
+
+        // --- TAB 2: QUERY TYPE DETAILS & CROSSTAB CALCULATOR ---
+        function showQueryDetails(type) {
+            document.querySelectorAll('.qtype-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'bg-amber-50/50');
+                btn.classList.add('border-slate-200');
+            });
+            document.getElementById('qtype-' + type).classList.add('border-amber-500', 'bg-amber-50/50');
+
+            const calcBox = document.getElementById('crosstab-calc-box');
+            if (type === 'crosstab') {
+                calcBox.classList.remove('hidden');
+            } else {
+                calcBox.classList.add('hidden');
+            }
+
+            const title = document.getElementById('qdetail-title');
+            const desc = document.getElementById('qdetail-desc');
+            const code = document.getElementById('qdetail-code');
+            const footer = document.getElementById('qdetail-footer');
+
+            if (type === 'select') {
+                title.innerText = "Select Queries Overview";
+                desc.innerText = "Select queries return structured 2D matrices. Field aliases are capped at 27 characters and auto-indexed if duplicate names occur.";
+                code.innerText = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID", 
+       [MI_EQUIP000].[EQUIP_TECH_NBR_C] "Tech Number",
+       [MI_FNCLOC00].[FNC_LOC_C] "Functional Location"
+FROM [MI_EQUIP000] 
+JOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}`;
+                footer.innerHTML = "<strong>Key Rule:</strong> Mathematical aggregations force unformatted execution behavior.";
+            } else if (type === 'crosstab') {
+                title.innerText = "Crosstab Queries & Matrix Aggregation";
+                desc.innerText = "Pivots multidimensional data horizontally and vertically using DECODE and SIGN logic to aggregate metrics into matrix buckets.";
+                code.innerText = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Asset",
+       SUM(DECODE(SIGN([DOWNTIME] - 7), -1, [DOWNTIME], 0, [DOWNTIME], 0)) "1 to 7 Days",
+       SUM(DECODE(SIGN([DOWNTIME] - 7), 1, [DOWNTIME], 0)) "Over 7 Days"
+FROM [MI_EQUIP000]
+JOIN_SUCC [MI_EVENT] ON {Asset Has Event}
+GROUP BY [MI_EQUIP000].[EQUIP_ID_C]`;
+                footer.innerHTML = "<strong>Key Rule:</strong> Combines SIGN remainder checking with DECODE for variable bucket routing.";
+            } else if (type === 'action') {
+                title.innerText = "Action Queries (Update / Append / Delete)";
+                desc.innerText = "Action queries modify underlying database states. Append queries use 'Append To' field mapping; Delete permanently purges records.";
+                code.innerText = `-- UPDATE EXAMPLE
+UPDATE [MI_EQUIP000]
+SET [MANUFACTURER_C] = 'General Electric'
+WHERE [MANUFACTURER_C] = 'GE Industrial';
+
+-- DELETE EXAMPLE (Requires Super User)
+DELETE FROM [MI_EVNT000]
+WHERE [EVENT_DATE_D] < (Now() - 365);`;
+                footer.innerHTML = "<strong>Safety Guardrail:</strong> Always execute a SELECT query first to validate record targets before running UPDATE or DELETE.";
+            }
+        }
+
+        function evalCrosstabSign() {
+            const val = parseFloat(document.getElementById('crosstab-days-input').value) || 0;
+            const diff = val - 7;
+            const sign = Math.sign(diff);
+            const res = document.getElementById('crosstab-result-bucket');
+
+            if (sign <= 0) {
+                res.innerText = "1 to 7 Days";
+                res.className = "text-emerald-400 font-bold";
+            } else {
+                res.innerText = "Over 7 Days";
+                res.className = "text-amber-400 font-bold";
+            }
+        }
+
+        // --- TAB 3: FUNCTION LIBRARY RENDER & FILTER ---
+        function renderFunctions(funcs) {
+            const container = document.getElementById('func-container');
+            container.innerHTML = '';
+
+            funcs.forEach(f => {
+                let catBadge = "bg-slate-100 text-slate-800";
+                if (f.category === "ANALYTIC") catBadge = "bg-sky-100 text-sky-800";
+                if (f.category === "STRING") catBadge = "bg-emerald-100 text-emerald-800";
+                if (f.category === "TEMPORAL") catBadge = "bg-amber-100 text-amber-800";
+                if (f.category === "PROPRIETARY") catBadge = "bg-indigo-100 text-indigo-800";
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col justify-between hover:shadow-md transition";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-slate-900 text-sm">${f.name}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-semibold ${catBadge}">${f.category}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">${f.desc}</p>
+                        <pre class="bg-slate-900 text-sky-300 p-2 rounded text-[11px] font-mono overflow-x-auto mb-3">${f.syntax}</pre>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
+                        <strong>DBMS Quirk:</strong> ${f.quirk}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterFunctions() {
+            const query = document.getElementById('func-search-input').value.toLowerCase();
+            const cat = document.getElementById('func-cat-filter').value;
+
+            const filtered = functionLibrary.filter(f => {
+                const matchesSearch = f.name.toLowerCase().includes(query) || f.desc.toLowerCase().includes(query);
+                const matchesCat = cat === "ALL" || f.category === cat;
+                return matchesSearch && matchesCat;
+            });
+
+            renderFunctions(filtered);
+        }
+
+        // --- TAB 4: PERFORMANCE SCENARIOS & CHART ---
+        const perfData = {
+            family_scope: {
+                bad: `SELECT * FROM [Recommendation]`,
+                good: `SELECT [REC_ID_C], [REC_DESC_TE] \nFROM [APM General Recommendation]`,
+                eval: "Querying the root Recommendation family forces the engine to evaluate all polymorphic sub-families. Directing queries to explicit leaf families avoids unnecessary schema traversals.",
+                badLatency: 450, goodLatency: 35
+            },
+            wildcard: {
+                bad: `SELECT [ASSET_ID_CHR] FROM [MI_EQUIP000]\nWHERE [ASSET_ID_CHR] LIKE '%PUMP'`,
+                good: `SELECT [ASSET_ID_CHR] FROM [MI_EQUIP000]\nWHERE [ASSET_ID_CHR] LIKE 'PUMP%'`,
+                eval: "Leading wildcards (%Value) force full table scans by bypassing B-Tree indices. Prefix wildcards (Value%) preserve index seek utilization.",
+                badLatency: 380, goodLatency: 22
+            },
+            where_having: {
+                bad: `SELECT [DEPT], AVG([COST]) FROM [WORK_ORDERS]\nGROUP BY [DEPT]\nHAVING [DEPT] = 'MECHANICAL'`,
+                good: `SELECT [DEPT], AVG([COST]) FROM [WORK_ORDERS]\nWHERE [DEPT] = 'MECHANICAL'\nGROUP BY [DEPT]`,
+                eval: "HAVING filters data after memory-intensive aggregation. WHERE limits records prior to grouping, drastically cutting processing overhead.",
+                badLatency: 290, goodLatency: 40
+            },
+            or_union: {
+                bad: `SELECT [ASSET_ID] FROM [EQUIP]\nWHERE [TYPE] = 'PUMP' OR [LOCATION] = 'PLANT-1'`,
+                good: `SELECT [ASSET_ID] FROM [EQUIP] WHERE [TYPE] = 'PUMP'\nUNION\nSELECT [ASSET_ID] FROM [EQUIP] WHERE [LOCATION] = 'PLANT-1'`,
+                eval: "Relational engines often bypass indices on OR logic. Restructuring into UNION allows independent index seek executions.",
+                badLatency: 310, goodLatency: 55
+            }
+        };
+
+        function selectPerfScenario(key) {
+            document.querySelectorAll('.perf-scenario-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'bg-amber-50/50');
+                btn.classList.add('border-slate-200');
+            });
+            document.getElementById('perf-btn-' + key).classList.add('border-amber-500', 'bg-amber-50/50');
+
+            const item = perfData[key];
+            document.getElementById('perf-code-bad').innerText = item.bad;
+            document.getElementById('perf-code-good').innerText = item.good;
+            document.getElementById('perf-eval-text').innerText = item.eval;
+
+            updatePerfChart(item.badLatency, item.goodLatency);
+        }
+
+        let perfChartInstance = null;
+        function initPerfChart() {
+            window.chartInitialized = true;
+            const ctx = document.getElementById('perfChart').getContext('2d');
+            perfChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sub-Optimal Query (Anti-Pattern)', 'Optimized Architecture Meta SQL'],
+                    datasets: [{
+                        label: 'Execution Latency (ms)',
+                        data: [450, 35],
+                        backgroundColor: ['#f43f5e', '#10b981'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return context.raw + ' ms execution time'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Milliseconds (Lower is Better)', color: '#64748b' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePerfChart(bad, good) {
+            if (perfChartInstance) {
+                perfChartInstance.data.datasets[0].data = [bad, good];
+                perfChartInstance.update();
+            }
+        }
+
+        // --- TAB 5: MODULE META SQL GENERATOR ---
+        const moduleOptions = {
+            ASSET: {
+                filters: [
+                    { id: "EQ_FL", label: "Equipment Linked to Functional Location" },
+                    { id: "EQ_CMMS", label: "Equipment with CMMS External Mapping" }
+                ],
+                info: "<strong>Target Schema:</strong> [MI_EQUIP000] JOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}<br><strong>Security Group:</strong> General Viewer"
+            },
+            TM: {
+                filters: [
+                    { id: "TM_CORROSION", label: "TML Groups with High Corrosion Rates" },
+                    { id: "TM_READINGS", label: "Recent Thickness Measurements" }
+                ],
+                info: "<strong>Target Schema:</strong> [MI_TMLGRP00] JOIN_SUCC [MI_TML00000] ON {TML Has TML Group}<br><strong>Security Group:</strong> TM Inspector / Data Clerk"
+            },
+            IM: {
+                filters: [
+                    { id: "IM_TASKS", label: "Pending Inspection Tasks" },
+                    { id: "IM_RECS", label: "Open Inspection Recommendations" }
+                ],
+                info: "<strong>Target Schema:</strong> [MI_INSPTASK] JOIN_SUCC [MI_INSPRECS] ON {Task Has Recommendations}<br><strong>Security Group:</strong> Inspector / Inspection Supervisor"
+            },
+            RBI: {
+                filters: [
+                    { id: "RBI_RISK", label: "High Probability of Failure Analyses" },
+                    { id: "RBI_LOSS", label: "Production Loss Events Linked to Risk" }
+                ],
+                info: "<strong>Target Schema:</strong> [MI_CCRBICOM] JOIN [MI_MRBIANAL] ON {MIR_RBICRAN}<br><strong>Security Group:</strong> RBI Analyst"
+            }
+        };
+
+        function updateGeneratorOptions() {
+            const modKey = document.getElementById('gen-module').value;
+            const filterSelect = document.getElementById('gen-filter');
+            const infoBox = document.getElementById('gen-module-info');
+
+            const modData = moduleOptions[modKey];
+            filterSelect.innerHTML = '';
+            modData.filters.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.innerText = f.label;
+                filterSelect.appendChild(opt);
+            });
+
+            infoBox.innerHTML = modData.info;
+            generateMetaSQL();
+        }
+
+        function generateMetaSQL() {
+            const mod = document.getElementById('gen-module').value;
+            const filter = document.getElementById('gen-filter').value;
+            const time = document.getElementById('gen-time').value;
+            const output = document.getElementById('gen-output-code');
+
+            let sql = "";
+
+            if (mod === "ASSET") {
+                if (filter === "EQ_FL") {
+                    sql = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID",\n       [MI_EQUIP000].[EQUIP_TECH_NBR_C] "Tech Number",\n       [MI_FNCLOC00].[FNC_LOC_C] "Functional Location"\nFROM [MI_EQUIP000]\nJOIN_PRED [MI_FNCLOC00] ON {MIR_FLHSEQ}`;
+                } else {
+                    sql = `SELECT [MI_EQUIP000].[EQUIP_ID_C] "Equipment ID",\n       [MI_EQUIP000].[ASSET_CMMS_ID] "EAM CMMS Key"\nFROM [MI_EQUIP000]\nWHERE [MI_EQUIP000].[ASSET_CMMS_ID] IS NOT NULL`;
+                }
+            } else if (mod === "TM") {
+                if (filter === "TM_CORROSION") {
+                    sql = `SELECT [MI_TMLGRP00].[TML_GROUP_ID_C] "TML Group",\n       AVG([MI_TML00000].[CORROSION_RATE_N]) "Avg Corrosion Rate (IN/YR)"\nFROM [MI_TMLGRP00]\nJOIN_SUCC [MI_TML00000] ON {TML Has TML Group}\nGROUP BY [MI_TMLGRP00].[TML_GROUP_ID_C]`;
+                } else {
+                    sql = `SELECT [MI_TML00000].[TML_ID_C] "TML ID",\n       [MI_TMREADING].[READING_VAL_N] "Thickness Reading"\nFROM [MI_TML00000]\nJOIN_SUCC [MI_TMREADING] ON {TML Has Readings}`;
+                }
+            } else if (mod === "IM") {
+                if (filter === "IM_TASKS") {
+                    sql = `SELECT [MI_INSPTASK].[TASK_ID_C] "Task ID",\n       [MI_INSPTASK].[TASK_STATE_C] "State"\nFROM [MI_INSPTASK]\nWHERE [MI_INSPTASK].[TASK_STATE_C] = 'PENDING'`;
+                } else {
+                    sql = `SELECT [MI_INSPRECS].[REC_ID_C] "Recommendation ID",\n       [MI_INSPRECS].[REC_STATUS_C] "Status"\nFROM [MI_INSPRECS]`;
+                }
+            } else if (mod === "RBI") {
+                if (filter === "RBI_RISK") {
+                    sql = `SELECT [MI_CCRBICOM].[COMPONENT_ID_C] "RBI Component",\n       MAX([MI_MRBIANAL].[MI_CRITANAL_PROB_OF_FAIL_UP_C]) "Max Failure Prob"\nFROM [MI_CCRBICOM]\nJOIN {MIR_RBICRAN} ON [MI_CCRBICOM].ENTY_KEY = {MIR_RBICRAN}.PRED_ENTY_KEY\nJOIN [MI_MRBIANAL] ON {MIR_RBICRAN}.SUCC_ENTY_KEY = [MI_MRBIANAL].ENTY_KEY\nGROUP BY [MI_CCRBICOM].[COMPONENT_ID_C]`;
+                } else {
+                    sql = `SELECT [MI_PRDNEVNT].[EVENT_ID_C] "Event ID",\n       SUM([MI_PRDNLOSS].[LOSS_COST_N]) "Total Loss Cost"\nFROM [MI_PRDNEVNT]\nJOIN_SUCC [MI_PRDNLOSS] ON {MIR_CBPRDEVN}\nGROUP BY [MI_PRDNEVNT].[EVENT_ID_C]`;
+                }
+            }
+
+            // Apply Temporal Modifier
+            if (time === "DUE_30") {
+                sql += `\nWHERE [DUE_DATE_D] <= (Now() + 30)`;
+            } else if (time === "PAST_YEAR") {
+                sql += `\nWHERE [CREATE_DATE_D] >= (Now() - 365)`;
+            }
+
+            output.innerText = sql;
+        }
+
+        function copyGeneratedSQL() {
+            const code = document.getElementById('gen-output-code').innerText;
+            navigator.clipboard.writeText(code);
+            alert("Meta SQL code copied to clipboard!");
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            switchTab('architecture');
+            renderFunctions(functionLibrary);
+            updateGeneratorOptions();
+        });
+    </script>
+</body>
+</html>
